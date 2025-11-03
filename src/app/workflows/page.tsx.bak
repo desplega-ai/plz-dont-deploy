@@ -1,0 +1,222 @@
+"use client";
+
+import { useState, useCallback, useEffect } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import { Save, Play } from "lucide-react";
+import {
+  ReactFlow,
+  MiniMap,
+  Controls,
+  Background,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  type Node,
+  type Edge,
+  type Connection,
+  NodeTypes,
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
+
+// Import custom node components
+import { InputNode } from "@/components/workflow/InputNode";
+import { AICategoryNode } from "@/components/workflow/AICategoryNode";
+import { RulesCategoryNode } from "@/components/workflow/RulesCategoryNode";
+import { OutputNode } from "@/components/workflow/OutputNode";
+
+const nodeTypes: NodeTypes = {
+  inputNode: InputNode,
+  aiCategory: AICategoryNode,
+  rulesCategory: RulesCategoryNode,
+  outputNode: OutputNode,
+};
+
+const initialNodes: Node[] = [
+  {
+    id: "input-1",
+    type: "inputNode",
+    position: { x: 250, y: 50 },
+    data: { label: "New Transaction" },
+  },
+];
+
+const initialEdges: Edge[] = [];
+
+export default function WorkflowsPage() {
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    loadWorkflow();
+  }, []);
+
+  const loadWorkflow = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/workflows");
+      if (response.ok) {
+        const data = await response.json();
+        if (data.nodes && data.edges) {
+          setNodes(data.nodes);
+          setEdges(data.edges);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load workflow:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveWorkflow = async () => {
+    try {
+      setSaving(true);
+      const response = await fetch("/api/workflows", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nodes, edges }),
+      });
+
+      if (response.ok) {
+        toast.success("Workflow saved successfully");
+      } else {
+        toast.error("Failed to save workflow");
+      }
+    } catch (error) {
+      toast.error("Failed to save workflow");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const onConnect = useCallback(
+    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+    [setEdges]
+  );
+
+  const addAINode = () => {
+    const newNode: Node = {
+      id: `ai-${Date.now()}`,
+      type: "aiCategory",
+      position: { x: 250, y: 200 },
+      data: { label: "AI Categorization" },
+    };
+    setNodes((nds) => [...nds, newNode]);
+  };
+
+  const addRulesNode = () => {
+    const newNode: Node = {
+      id: `rules-${Date.now()}`,
+      type: "rulesCategory",
+      position: { x: 250, y: 200 },
+      data: { label: "Rules Based Categorization" },
+    };
+    setNodes((nds) => [...nds, newNode]);
+  };
+
+  const addOutputNode = (type: "webhook" | "email" | "slack") => {
+    const labels = {
+      webhook: "Webhook (Coming Soon)",
+      email: "Email (Coming Soon)",
+      slack: "Slack (Coming Soon)",
+    };
+
+    const newNode: Node = {
+      id: `${type}-${Date.now()}`,
+      type: "outputNode",
+      position: { x: 250, y: 400 },
+      data: { label: labels[type], outputType: type },
+    };
+    setNodes((nds) => [...nds, newNode]);
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="sticky-header">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/dashboard">
+            <Button variant="ghost">← Back to Dashboard</Button>
+          </Link>
+          <h1 className="text-2xl font-bold">Workflow Builder</h1>
+          <div />
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold">Transaction Categorization Workflow</h2>
+              <p className="text-muted-foreground">
+                Build your automated categorization workflow
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={saveWorkflow} disabled={saving}>
+                <Save className="mr-2 h-4 w-4" />
+                {saving ? "Saving..." : "Save Workflow"}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Add Nodes</CardTitle>
+            <CardDescription>Drag nodes onto the canvas to build your workflow</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={addAINode}>
+                + AI Categorization
+              </Button>
+              <Button variant="outline" onClick={addRulesNode}>
+                + Rules Based Categorization
+              </Button>
+              <Button variant="outline" onClick={() => addOutputNode("webhook")}>
+                + Webhook Output
+              </Button>
+              <Button variant="outline" onClick={() => addOutputNode("email")}>
+                + Email Output
+              </Button>
+              <Button variant="outline" onClick={() => addOutputNode("slack")}>
+                + Slack Output
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-0">
+            <div style={{ height: "600px" }}>
+              {loading ? (
+                <div className="h-full flex items-center justify-center">
+                  <p className="text-muted-foreground">Loading workflow...</p>
+                </div>
+              ) : (
+                <ReactFlow
+                  nodes={nodes}
+                  edges={edges}
+                  onNodesChange={onNodesChange}
+                  onEdgesChange={onEdgesChange}
+                  onConnect={onConnect}
+                  nodeTypes={nodeTypes}
+                  fitView
+                >
+                  <Controls />
+                  <MiniMap />
+                  <Background variant="dots" gap={12} size={1} />
+                </ReactFlow>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
+}

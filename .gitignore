@@ -1,0 +1,48 @@
+# dependencies
+node_modules
+bun.lock
+
+# output
+out
+dist
+build
+*.tgz
+
+# Next.js
+.next/
+next-env.d.ts
+
+# code coverage
+coverage
+*.lcov
+
+# logs
+logs
+*.log
+report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# IntelliJ based IDEs
+.idea
+.vscode
+
+# Finder (MacOS) folder config
+.DS_Store
+Thumbs.db
+
+# Workflow data
+.workflow-data/
+
+# Vercel
+.vercel

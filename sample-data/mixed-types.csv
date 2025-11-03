@@ -1,0 +1,16 @@
+date,type,amount,description
+2025-01-05,deposit,3500.00,Salary direct deposit
+2025-01-06,withdrawal,500.00,ATM cash withdrawal
+2025-01-07,debit,125.50,Grocery store purchase
+2025-01-08,debit,45.00,Coffee shop
+2025-01-09,credit,50.00,Refund for returned item
+2025-01-10,debit,89.99,Online shopping Amazon
+2025-01-11,deposit,250.00,Freelance project payment
+2025-01-12,debit,1200.00,Monthly rent check
+2025-01-13,withdrawal,200.00,Cash for weekend
+2025-01-14,debit,78.50,Restaurant dinner
+2025-01-15,credit,35.00,Cashback reward
+2025-01-16,debit,156.00,Electric bill payment
+2025-01-17,debit,45.99,Gas station fill up
+2025-01-18,deposit,1500.00,Bonus payment
+2025-01-19,debit,250.00,Insurance premium

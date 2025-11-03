@@ -1,0 +1,99 @@
+date,type,amount,description,merchantName,latitude,longitude
+2025-10-30,debit,45.67,Coffee Shop Downtown,Blue Bottle Coffee,37.7749,-122.4194
+2025-10-29,debit,125.00,Grocery Store,Whole Foods Market,37.7833,-122.4167
+2025-10-28,credit,2500.00,Monthly Salary,Acme Corp,,,
+2025-10-27,debit,15.99,Streaming Service,Netflix,,,
+2025-10-26,debit,89.43,Gas Station,Shell,37.7695,-122.4156
+2025-10-25,debit,234.56,Restaurant Dinner,The French Laundry,38.4024,-122.4700
+2025-10-24,debit,12.50,Fast Food,Chipotle,37.7749,-122.4194
+2025-10-23,debit,67.89,Pharmacy,Walgreens,37.7833,-122.4167
+2025-10-22,debit,450.00,Rent Utilities,PG&E,,,
+2025-10-21,credit,150.00,Freelance Work,Client Payment,,,
+2025-10-20,debit,23.45,Book Store,Barnes & Noble,37.7858,-122.4064
+2025-10-19,debit,156.78,Electronics Store,Best Buy,37.7705,-122.4025
+2025-10-18,debit,8.99,Mobile App,Spotify Premium,,,
+2025-10-17,debit,34.56,Pizza Delivery,Domino's Pizza,37.7749,-122.4194
+2025-10-16,debit,98.76,Fitness Gym,24 Hour Fitness,37.7833,-122.4167
+2025-10-15,debit,200.00,Car Insurance,Geico,,,
+2025-10-14,debit,76.54,Clothing Store,H&M,37.7885,-122.4075
+2025-10-13,debit,145.67,Grocery Store,Safeway,37.7695,-122.4156
+2025-10-12,credit,500.00,Tax Refund,IRS,,,
+2025-10-11,debit,29.99,Subscription,Amazon Prime,,,
+2025-10-10,debit,54.32,Coffee Shop,Starbucks,37.7749,-122.4194
+2025-10-09,debit,178.90,Department Store,Target,37.7833,-122.4167
+2025-10-08,debit,12.00,Parking Fee,ParkMobile,37.7858,-122.4064
+2025-10-07,debit,89.00,Hair Salon,Supercuts,37.7705,-122.4025
+2025-10-06,debit,345.67,Hotel Stay,Marriott,37.7749,-122.4194
+2025-10-05,debit,23.45,Food Delivery,DoorDash,37.7833,-122.4167
+2025-10-04,credit,1200.00,Bonus Payment,Acme Corp,,,
+2025-10-03,debit,67.89,Pet Store,Petco,37.7695,-122.4156
+2025-10-02,debit,456.78,Dentist Visit,SF Dental,37.7858,-122.4064
+2025-10-01,debit,34.56,Bakery,Tartine,37.7609,-122.4158
+2025-09-30,debit,98.76,Wine Shop,K&L Wine Merchants,37.7833,-122.4167
+2025-09-29,debit,12.50,Car Wash,Quick Shine,37.7749,-122.4194
+2025-09-28,debit,234.56,Electronics,Apple Store,37.7858,-122.4064
+2025-09-27,credit,2500.00,Monthly Salary,Acme Corp,,,
+2025-09-26,debit,45.67,Lunch,Panera Bread,37.7705,-122.4025
+2025-09-25,debit,156.78,Home Improvement,Home Depot,37.7695,-122.4156
+2025-09-24,debit,67.89,Movie Theater,AMC,37.7833,-122.4167
+2025-09-23,debit,89.43,Gas Station,Chevron,37.7749,-122.4194
+2025-09-22,debit,23.45,Ice Cream,Bi-Rite Creamery,37.7609,-122.4247
+2025-09-21,debit,145.67,Grocery Store,Trader Joe's,37.7858,-122.4064
+2025-09-20,debit,54.32,Coffee Shop,Philz Coffee,37.7749,-122.4194
+2025-09-19,debit,298.00,Vet Visit,VCA Animal Hospital,37.7695,-122.4156
+2025-09-18,credit,300.00,Side Gig,Consulting Work,,,
+2025-09-17,debit,76.54,Sports Store,Dick's Sporting Goods,37.7833,-122.4167
+2025-09-16,debit,34.56,Breakfast,Denny's,37.7705,-122.4025
+2025-09-15,debit,123.45,Pharmacy,CVS,37.7858,-122.4064
+2025-09-14,debit,45.67,Lunch Special,Subway,37.7749,-122.4194
+2025-09-13,debit,267.89,Furniture,IKEA,37.7833,-122.4167
+2025-09-12,debit,12.00,Toll Fee,FasTrak,,,
+2025-09-11,debit,89.43,Garden Center,Lowe's,37.7695,-122.4156
+2025-09-10,debit,456.78,Car Repair,Midas,37.7705,-122.4025
+2025-09-09,credit,2500.00,Monthly Salary,Acme Corp,,,
+2025-09-08,debit,34.56,Donut Shop,Krispy Kreme,37.7749,-122.4194
+2025-09-07,debit,178.90,Shoe Store,Foot Locker,37.7833,-122.4167
+2025-09-06,debit,45.67,Juice Bar,Jamba Juice,37.7858,-122.4064
+2025-09-05,debit,234.56,Jewelry Store,Kay Jewelers,37.7695,-122.4156
+2025-09-04,debit,12.50,Smoothie,Smoothie King,37.7749,-122.4194
+2025-09-03,debit,156.78,Office Supplies,Staples,37.7705,-122.4025
+2025-09-02,debit,67.89,Game Store,GameStop,37.7833,-122.4167
+2025-09-01,debit,89.43,Gas Station,76,37.7695,-122.4156
+2025-08-31,debit,23.45,Bagel Shop,Noah's NY Bagels,37.7749,-122.4194
+2025-08-30,credit,800.00,Investment Return,Dividend Payment,,,
+2025-08-29,debit,145.67,Grocery Store,Sprouts,37.7858,-122.4064
+2025-08-28,debit,298.00,Urgent Care,One Medical,37.7833,-122.4167
+2025-08-27,credit,2500.00,Monthly Salary,Acme Corp,,,
+2025-08-26,debit,54.32,Breakfast Cafe,IHOP,37.7705,-122.4025
+2025-08-25,debit,76.54,Hardware Store,Ace Hardware,37.7695,-122.4156
+2025-08-24,debit,234.56,Toy Store,Toys R Us,37.7749,-122.4194
+2025-08-23,debit,12.00,Laundromat,Wash Club,37.7858,-122.4064
+2025-08-22,debit,89.43,Craft Store,Michaels,37.7833,-122.4167
+2025-08-21,debit,456.78,Plumber Service,Roto-Rooter,,,
+2025-08-20,debit,34.56,Taco Place,Taco Bell,37.7749,-122.4194
+2025-08-19,debit,178.90,Eyewear,LensCrafters,37.7705,-122.4025
+2025-08-18,credit,250.00,Cash Back Reward,Credit Card Rewards,,,
+2025-08-17,debit,45.67,Sandwich Shop,Jersey Mike's,37.7695,-122.4156
+2025-08-16,debit,267.89,Florist,1-800-Flowers,37.7858,-122.4064
+2025-08-15,debit,12.50,Frozen Yogurt,Yogurtland,37.7749,-122.4194
+2025-08-14,debit,156.78,Pet Grooming,PetSmart,37.7833,-122.4167
+2025-08-13,credit,2500.00,Monthly Salary,Acme Corp,,,
+2025-08-12,debit,67.89,Music Store,Guitar Center,37.7705,-122.4025
+2025-08-11,debit,89.43,Gas Station,Arco,37.7695,-122.4156
+2025-08-10,debit,234.56,Appliance Store,Sears,37.7858,-122.4064
+2025-08-09,debit,23.45,Bubble Tea,Boba Guys,37.7749,-122.4194
+2025-08-08,debit,145.67,Farm Market,Farmer's Market,37.7609,-122.4247
+2025-08-07,debit,54.32,Sushi Restaurant,Sushi Bar,37.7833,-122.4167
+2025-08-06,debit,298.00,Massage Therapy,Massage Envy,37.7705,-122.4025
+2025-08-05,debit,76.54,Candy Store,See's Candies,37.7695,-122.4156
+2025-08-04,credit,400.00,Gift Money,Birthday Gift,,,
+2025-08-03,debit,234.56,Camping Gear,REI,37.7858,-122.4064
+2025-08-02,debit,12.00,Arcade,Dave & Buster's,37.7833,-122.4167
+2025-08-01,debit,89.43,Print Shop,FedEx Office,37.7749,-122.4194
+2025-07-31,credit,2500.00,Monthly Salary,Acme Corp,,,
+2025-07-30,debit,45.67,Ramen Shop,Mensho Tokyo,37.7705,-122.4025
+2025-07-29,debit,267.89,Tire Shop,Discount Tire,37.7695,-122.4156
+2025-07-28,debit,12.50,Cupcake Shop,Sprinkles,37.7858,-122.4064
+2025-07-27,debit,156.78,Travel Agency,Expedia Office,37.7833,-122.4167
+2025-07-26,debit,67.89,Thrift Store,Goodwill,37.7749,-122.4194
+2025-07-25,debit,89.43,Gas Station,Shell,37.7705,-122.4025

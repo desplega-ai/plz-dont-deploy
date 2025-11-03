@@ -1,0 +1,215 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+}
+
+enum RecurringFrequency {
+  DAILY
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum RuleMatchField {
+  DESCRIPTION
+  AMOUNT
+  DATE
+  AMOUNT_RANGE
+}
+
+enum WorkflowStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id                     String                   @id @default(cuid())
+  email                  String                   @unique
+  passwordHash           String
+  role                   UserRole                 @default(USER)
+  emailVerified          Boolean                  @default(false)
+  magicLinkEnabled       Boolean                  @default(true)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  sessions               Session[]
+  emailVerificationToken EmailVerificationToken[]
+  magicLinkToken         MagicLinkToken[]
+  bankAccounts           BankAccount[]
+  categories             Category[]
+  categoryRules          CategoryRule[]
+  workflowRuns           WorkflowRun[]
+  workflows              Workflow[]
+
+  @@index([email])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model MagicLinkToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model BankAccount {
+  id           String        @id @default(cuid())
+  userId       String
+  name         String
+  type         String // checking, savings, credit, etc.
+  currency     String        @default("USD")
+  balance      Float         @default(0)
+  description  String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId])
+}
+
+model Transaction {
+  id                 String               @id @default(cuid())
+  bankAccountId      String
+  amount             Float
+  type               TransactionType
+  date               DateTime
+  description        String
+  categoryId         String?
+  isRecurring        Boolean              @default(false)
+  recurringFrequency RecurringFrequency?
+  latitude           Float?
+  longitude          Float?
+  locationName       String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  bankAccount        BankAccount          @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+  category           Category?            @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([bankAccountId])
+  @@index([categoryId])
+  @@index([date])
+  @@index([type])
+}
+
+model Category {
+  id            String         @id @default(cuid())
+  userId        String
+  name          String
+  color         String         @default("#3b82f6") // default blue
+  parentId      String? // for subcategories
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent        Category?      @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  subcategories Category[]     @relation("CategoryHierarchy")
+  transactions  Transaction[]
+  rules         CategoryRule[]
+
+  @@unique([userId, name, parentId])
+  @@index([userId])
+  @@index([parentId])
+}
+
+model CategoryRule {
+  id           String         @id @default(cuid())
+  userId       String
+  categoryId   String
+  name         String // descriptive name for the rule
+  matchField   RuleMatchField
+  matchPattern String // regex pattern or value to match
+  minAmount    Float? // for AMOUNT_RANGE
+  maxAmount    Float? // for AMOUNT_RANGE
+  priority     Int            @default(0) // higher priority rules are evaluated first
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category     Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([categoryId])
+  @@index([priority])
+}
+
+model WorkflowRun {
+  id          String         @id @default(cuid())
+  userId      String
+  workflowId  String // workflow identifier
+  status      WorkflowStatus @default(PENDING)
+  input       Json? // input parameters
+  result      Json? // workflow result
+  error       String? // error message if failed
+  startedAt   DateTime       @default(now())
+  completedAt DateTime?
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([workflowId])
+  @@index([status])
+}
+
+model Workflow {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  nodes       Json // React Flow nodes
+  edges       Json // React Flow edges
+  isActive    Boolean  @default(false) // Only one can be active
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@index([isActive])
+}

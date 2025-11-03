@@ -4,14 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 4010",
-    "build": "prisma generate && prisma migrate deploy && next build",
-    "postinstall": "prisma generate",
+    "build": "prisma generate --no-hints && prisma migrate deploy && next build",
+    "postinstall": "prisma generate --no-hints",
     "start": "next start -p 4010",
     "lint": "next lint",
-    "db:seed": "tsx prisma/seed.ts"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "db:seed": "prisma db seed"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -38,6 +35,7 @@
     "cmdk": "^1.1.1",
     "dagre": "^0.8.5",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
     "jose": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.3",

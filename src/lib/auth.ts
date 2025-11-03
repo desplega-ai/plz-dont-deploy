@@ -14,6 +14,7 @@ export interface JWTPayload {
   userId: string;
   email: string;
   role: string;
+  nonce?: string; // Optional random nonce for ensuring token uniqueness
 }
 
 // Password utilities
@@ -52,7 +53,13 @@ export async function createSession(userId: string) {
     throw new Error("User not found");
   }
 
-  const token = generateToken();
+  // Generate JWT with random nonce to ensure uniqueness even under concurrent requests
+  const token = generateJWT({
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    nonce: crypto.randomUUID(), // Ensures uniqueness for concurrent session creation
+  });
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // 7 days

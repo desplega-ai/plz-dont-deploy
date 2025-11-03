@@ -285,6 +285,7 @@ function TransactionsPageContent() {
     try {
       const payload = {
         ...formData,
+        type: formData.type.toUpperCase(),
         amount: parseFloat(formData.amount),
         latitude: mapLocation?.lat,
         longitude: mapLocation?.lng,
@@ -308,7 +309,7 @@ function TransactionsPageContent() {
         setFormData({
           bankAccountId: selectedAccount !== "__all__" ? selectedAccount : "",
           amount: "",
-          type: "debit",
+          type: "debit".toUpperCase(),
           date: new Date().toISOString().split("T")[0],
           description: "",
           categoryId: "",
@@ -615,7 +616,7 @@ function TransactionsPageContent() {
                             <div>
                               <div className="font-semibold mb-2">Example CSV:</div>
                               <pre className="bg-muted p-3 rounded text-xs overflow-x-auto font-mono">
-date,amount,description{"\n"}2025-01-15,45.50,Coffee at Main Street Cafe{"\n"}2025-01-16,-120.00,Grocery shopping{"\n"}2025-01-17,2500.00,Monthly salary deposit
+                                date,amount,description{"\n"}2025-01-15,45.50,Coffee at Main Street Cafe{"\n"}2025-01-16,-120.00,Grocery shopping{"\n"}2025-01-17,2500.00,Monthly salary deposit
                               </pre>
                             </div>
 

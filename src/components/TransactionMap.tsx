@@ -31,6 +31,7 @@ interface Transaction {
 
 interface TransactionMapProps {
   transactions: Transaction[];
+  centerLocation?: { lat: number; lng: number } | null;
 }
 
 // Custom component to add heatmap layer
@@ -113,6 +114,22 @@ function FitBoundsToMarkers({ transactions }: TransactionMapProps) {
   return null;
 }
 
+// Component to handle centering on searched location
+function CenterOnLocation({ centerLocation }: { centerLocation?: { lat: number; lng: number } | null }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (centerLocation) {
+      map.setView([centerLocation.lat, centerLocation.lng], 13, {
+        animate: true,
+        duration: 1,
+      });
+    }
+  }, [centerLocation, map]);
+
+  return null;
+}
+
 // Button component to fit view
 function FitViewButton({ transactions }: TransactionMapProps) {
   const map = useMap();
@@ -162,7 +179,7 @@ function FitViewButton({ transactions }: TransactionMapProps) {
   );
 }
 
-export default function TransactionMap({ transactions }: TransactionMapProps) {
+export default function TransactionMap({ transactions, centerLocation }: TransactionMapProps) {
   if (!transactions.length) {
     return (
       <div className="h-[600px] w-full flex items-center justify-center bg-muted rounded-lg">
@@ -206,6 +223,7 @@ export default function TransactionMap({ transactions }: TransactionMapProps) {
         />
 
         <FitBoundsToMarkers transactions={transactions} />
+        <CenterOnLocation centerLocation={centerLocation} />
         <FitViewButton transactions={transactions} />
         <HeatmapLayer transactions={transactions} />
 
@@ -213,22 +231,29 @@ export default function TransactionMap({ transactions }: TransactionMapProps) {
           if (!transaction.latitude || !transaction.longitude) return null;
 
           // Create custom icon based on transaction type
+          const transactionLabel = `${transaction.description} - ${formatCurrency(transaction.amount)} (${formatDate(transaction.date)})`;
           const icon = L.divIcon({
             className: "custom-marker",
             html: `
-              <div style="
-                width: 24px;
-                height: 24px;
-                border-radius: 50%;
-                background-color: ${transaction.type === "CREDIT" ? "#52c41a" : "#ff4d4f"};
-                border: 2px solid white;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-size: 12px;
-                font-weight: bold;
+              <div
+                role="button"
+                tabindex="0"
+                aria-label="Transaction: ${transactionLabel.replace(/"/g, '&quot;')}"
+                data-transaction-id="${transaction.id}"
+                style="
+                  width: 24px;
+                  height: 24px;
+                  border-radius: 50%;
+                  background-color: ${transaction.type === "CREDIT" ? "#52c41a" : "#ff4d4f"};
+                  border: 2px solid white;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-size: 12px;
+                  font-weight: bold;
+                  cursor: pointer;
               ">
                 ${transaction.type === "CREDIT" ? "+" : "-"}
               </div>
@@ -242,6 +267,8 @@ export default function TransactionMap({ transactions }: TransactionMapProps) {
               key={transaction.id}
               position={[transaction.latitude, transaction.longitude]}
               icon={icon}
+              title={transactionLabel}
+              alt={`Transaction marker for ${transaction.description}`}
               eventHandlers={{
                 click: (e) => {
                   // Zoom in to the clicked marker

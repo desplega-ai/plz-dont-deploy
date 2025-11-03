@@ -5,8 +5,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { ArrowLeft, MapPin } from "lucide-react";
+import { ArrowLeft, MapPin, Search } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const Map = dynamic(() => import("@/components/TransactionMap"), {
@@ -31,6 +32,7 @@ interface Transaction {
   longitude?: number;
   locationName?: string;
   category?: {
+    id: string;
     name: string;
     color: string;
   };
@@ -39,6 +41,10 @@ interface Transaction {
 export default function TransactionsMapPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [locationSearch, setLocationSearch] = useState("");
+  const [searchingLocation, setSearchingLocation] = useState(false);
+  const [locationSearchResults, setLocationSearchResults] = useState<any[]>([]);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     fetchTransactions();
@@ -65,6 +71,49 @@ export default function TransactionsMapPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLocationSearch = async () => {
+    if (!locationSearch.trim()) {
+      toast.error("Please enter a location to search");
+      return;
+    }
+
+    setSearchingLocation(true);
+    try {
+      const response = await fetch(
+        `/api/location/search?q=${encodeURIComponent(locationSearch)}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const results = await response.json();
+
+      if (results.length === 0) {
+        toast.info("No locations found. Try a different search term.");
+        setLocationSearchResults([]);
+      } else {
+        setLocationSearchResults(results);
+        toast.success(`Found ${results.length} location${results.length > 1 ? 's' : ''}`);
+      }
+    } catch (error) {
+      console.error("Location search error:", error);
+      toast.error("Failed to search location. Please try again.");
+      setLocationSearchResults([]);
+    } finally {
+      setSearchingLocation(false);
+    }
+  };
+
+  const handleSelectSearchResult = (result: any) => {
+    const lat = parseFloat(result.lat);
+    const lng = parseFloat(result.lon);
+    setMapCenter({ lat, lng });
+    setLocationSearchResults([]);
+    setLocationSearch("");
+    toast.success(`Zooming to ${result.display_name.split(',')[0]}`);
   };
 
   return (
@@ -102,6 +151,65 @@ export default function TransactionsMapPage() {
           </div>
         </div>
 
+        {/* Location Search */}
+        {!loading && transactions.length > 0 && (
+          <Card className="mb-6">
+            <CardContent className="pt-6">
+              <div className="flex items-end gap-2">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search for a location (e.g., 'New York', 'Paris', 'Tokyo')..."
+                      value={locationSearch}
+                      onChange={(e) => setLocationSearch(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleLocationSearch();
+                        }
+                      }}
+                      className="pl-9"
+                    />
+                  </div>
+                </div>
+                <Button
+                  onClick={handleLocationSearch}
+                  disabled={searchingLocation}
+                >
+                  {searchingLocation ? (
+                    <>
+                      <span className="h-4 w-4 animate-spin mr-2">⏳</span>
+                      Searching...
+                    </>
+                  ) : (
+                    <>
+                      <Search className="h-4 w-4 mr-2" />
+                      Search
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Search Results */}
+              {locationSearchResults.length > 0 && (
+                <div className="mt-4 border rounded-lg max-h-48 overflow-y-auto">
+                  {locationSearchResults.map((result, index) => (
+                    <div
+                      key={index}
+                      className="p-3 hover:bg-muted cursor-pointer text-sm border-b last:border-b-0 flex items-center gap-2"
+                      onClick={() => handleSelectSearchResult(result)}
+                    >
+                      <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                      <span>{result.display_name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {loading ? (
           <Card>
             <CardHeader>
@@ -134,7 +242,7 @@ export default function TransactionsMapPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Map transactions={transactions} />
+              <Map transactions={transactions} centerLocation={mapCenter} />
             </CardContent>
           </Card>
         )}

@@ -52,11 +52,7 @@ export async function createSession(userId: string) {
     throw new Error("User not found");
   }
 
-  const token = generateJWT({
-    userId: user.id,
-    email: user.email,
-    role: user.role,
-  });
+  const token = generateToken();
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // 7 days

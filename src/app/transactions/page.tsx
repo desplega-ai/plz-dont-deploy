@@ -290,7 +290,7 @@ function TransactionsPageContent() {
         latitude: mapLocation?.lat,
         longitude: mapLocation?.lng,
         categoryId: formData.categoryId === "__none__" ? undefined : formData.categoryId || undefined,
-        recurringFrequency: formData.isRecurring ? formData.recurringFrequency : undefined,
+        recurringFrequency: formData.isRecurring ? formData.recurringFrequency.toUpperCase() : undefined,
       };
 
       const url = editingId ? `/api/transactions/${editingId}` : "/api/transactions";

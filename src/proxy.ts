@@ -16,7 +16,7 @@ if (process.env.JWT_SECRET.length < 32) {
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Get token from cookie (single declaration)

@@ -1,0 +1,28 @@
+name: Post-deploy CI
+ 
+on:
+ repository_dispatch:
+   types:
+    - 'vercel.deployment.success'
+
+jobs:
+  run-desplega-ci:
+    if: github.event_name == 'repository_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: CI Suite
+        id: test
+        uses: tarasyarema/desplega.ai-action@main
+        with:
+          apiKey: ${{ secrets.DESPLEGA_API_KEY }}
+          suiteIds: 'b8bc4cde-6390-424b-ba6f-6d1175d7d24b'
+
+      - name: Print Output
+        id: output
+        run: |
+          echo "${{ steps.test.outputs.status }}"
+

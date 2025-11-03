@@ -490,6 +490,7 @@ function CategoriesPageContent() {
 
     setNodes([...nodes, newNode]);
     setShouldFitView(true); // Trigger fit view when adding new node
+    toast.success(`${nodeLabel} node added`);
   };
 
   const handleDeleteNode = () => {
@@ -646,6 +647,7 @@ function CategoriesPageContent() {
         },
       }, eds));
       setShouldFitView(true); // Trigger fit view on new connection
+      toast.success("Connection added");
     },
     [setEdges]
   );

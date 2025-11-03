@@ -65,7 +65,8 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://unpkg.com",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.vercel.ai https://*.openai.com https://*.anthropic.com",
+              "connect-src 'self' https://*.vercel.ai https://*.openai.com https://*.anthropic.com https://*.openstreetmap.org",
+              "frame-src 'self' https://*.openstreetmap.org",
               "frame-ancestors 'self'",
             ].join('; ')
           }

@@ -15,7 +15,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Trash2, Upload, MapPin, Eye, Search } from "lucide-react";
+import { Trash2, Upload, MapPin, Eye, Search, FileText } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useSearchParams, useRouter } from "next/navigation";
 import dynamicImport from "next/dynamic";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -370,13 +371,8 @@ function TransactionsPageContent() {
           body: JSON.stringify({
             bankAccountId: importData.bankAccountId,
             csvData,
-            defaultType: importData.defaultType,
-            columnMapping: {
-              date: "date",
-              description: "description",
-              amount: "amount",
-              type: "type",
-            },
+            defaultType: importData.defaultType.toUpperCase(),
+            // No columnMapping needed - backend will auto-detect columns
           }),
         });
 
@@ -421,18 +417,35 @@ function TransactionsPageContent() {
   };
 
   const handleLocationSearch = async () => {
-    if (!locationSearch.trim()) return;
+    if (!locationSearch.trim()) {
+      toast.error("Please enter a location to search");
+      return;
+    }
 
     setSearchingLocation(true);
     try {
-      // Using Nominatim (OpenStreetMap) API for geocoding
+      // Use our backend API to search for locations (proxies to Nominatim)
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationSearch)}&limit=5`
+        `/api/location/search?q=${encodeURIComponent(locationSearch)}`
       );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const results = await response.json();
-      setLocationSearchResults(results);
+
+      if (results.length === 0) {
+        toast.info("No locations found. Try a different search term.");
+        setLocationSearchResults([]);
+      } else {
+        setLocationSearchResults(results);
+        toast.success(`Found ${results.length} location${results.length > 1 ? 's' : ''}`);
+      }
     } catch (error) {
-      toast.error("Failed to search location");
+      console.error("Location search error:", error);
+      toast.error("Failed to search location. Please try again.");
+      setLocationSearchResults([]);
     } finally {
       setSearchingLocation(false);
     }
@@ -561,15 +574,65 @@ function TransactionsPageContent() {
                   Import CSV
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <form onSubmit={handleImportCSV}>
                   <DialogHeader>
                     <DialogTitle>Import Transactions from CSV</DialogTitle>
                     <DialogDescription>
-                      Upload a CSV file with columns: date, description, amount, type (optional)
+                      Our intelligent import automatically detects your CSV columns
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
+                    {/* Collapsible CSV Format Guide */}
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="format-guide" className="border rounded-lg px-4">
+                        <AccordionTrigger className="hover:no-underline">
+                          <div className="flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            <span className="font-semibold">CSV Format Guide</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-3 pt-2 text-sm">
+                            <div>
+                              <div className="font-semibold mb-2">Required Columns:</div>
+                              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                                <li><code className="bg-muted px-1.5 py-0.5 rounded text-xs">date</code> - Transaction date (YYYY-MM-DD)</li>
+                                <li><code className="bg-muted px-1.5 py-0.5 rounded text-xs">amount</code> - Transaction amount (positive or negative)</li>
+                                <li><code className="bg-muted px-1.5 py-0.5 rounded text-xs">description</code> or <code className="bg-muted px-1.5 py-0.5 rounded text-xs">merchant</code> - What the transaction was for</li>
+                              </ul>
+                            </div>
+
+                            <div>
+                              <div className="font-semibold mb-2">Optional Columns:</div>
+                              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                                <li><code className="bg-muted px-1.5 py-0.5 rounded text-xs">type</code> - credit/debit (auto-detected from amount if not provided)</li>
+                                <li><code className="bg-muted px-1.5 py-0.5 rounded text-xs">latitude</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">longitude</code> - Location coordinates</li>
+                                <li><code className="bg-muted px-1.5 py-0.5 rounded text-xs">merchantName</code> or <code className="bg-muted px-1.5 py-0.5 rounded text-xs">location</code> - Location name</li>
+                              </ul>
+                            </div>
+
+                            <div>
+                              <div className="font-semibold mb-2">Example CSV:</div>
+                              <pre className="bg-muted p-3 rounded text-xs overflow-x-auto font-mono">
+date,amount,description{"\n"}2025-01-15,45.50,Coffee at Main Street Cafe{"\n"}2025-01-16,-120.00,Grocery shopping{"\n"}2025-01-17,2500.00,Monthly salary deposit
+                              </pre>
+                            </div>
+
+                            <div className="pt-1">
+                              <a
+                                href="/sample-data/basic-transactions.csv"
+                                download
+                                className="text-primary hover:underline text-xs inline-flex items-center gap-1"
+                              >
+                                <FileText className="h-3 w-3" />
+                                Download sample CSV template
+                              </a>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                     <div className="space-y-2">
                       <Label htmlFor="import-account">Bank Account</Label>
                       <Select
@@ -755,29 +818,77 @@ function TransactionsPageContent() {
                       )}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="location">
+                      <Label>
                         <MapPin className="inline h-4 w-4 mr-1" />
                         Location (Optional)
                       </Label>
+
+                      {/* Location Search */}
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Search for a location..."
+                          value={locationSearch}
+                          onChange={(e) => setLocationSearch(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              handleLocationSearch();
+                            }
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleLocationSearch}
+                          disabled={searchingLocation}
+                        >
+                          {searchingLocation ? (
+                            <span className="h-4 w-4 animate-spin">⏳</span>
+                          ) : (
+                            <Search className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+
+                      {/* Search Results */}
+                      {locationSearchResults.length > 0 && (
+                        <div className="border rounded-lg max-h-48 overflow-y-auto">
+                          {locationSearchResults.map((result, index) => (
+                            <div
+                              key={index}
+                              className="p-2 hover:bg-muted cursor-pointer text-sm border-b last:border-b-0"
+                              onClick={() => handleSelectSearchResult(result)}
+                            >
+                              {result.display_name}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
                       <Input
                         id="location"
                         placeholder="Location name"
                         value={formData.locationName}
                         onChange={(e) => setFormData({ ...formData, locationName: e.target.value })}
                       />
-                      <div className="border rounded-lg overflow-hidden h-64">
-                        <iframe
-                          src={`https://www.openstreetmap.org/export/embed.html?bbox=-0.1,51.5,-0.09,51.51&layer=mapnik&marker=${mapLocation ? `${mapLocation.lat},${mapLocation.lng}` : "51.505,-0.09"
-                            }`}
-                          width="100%"
-                          height="100%"
-                          style={{ border: 0 }}
-                          title="Location Map"
-                        />
-                      </div>
-                      {mapLocation && (
+
+                      {mapLocation ? (
+                        <div className="mt-2">
+                          <SingleTransactionMap
+                            latitude={mapLocation.lat}
+                            longitude={mapLocation.lng}
+                            description={formData.description || "New transaction"}
+                            amount={parseFloat(formData.amount) || 0}
+                            type={formData.type.toUpperCase()}
+                            locationName={formData.locationName}
+                          />
+                          <p className="text-sm text-muted-foreground mt-2">
+                            Location: {mapLocation.lat.toFixed(6)}, {mapLocation.lng.toFixed(6)}
+                          </p>
+                        </div>
+                      ) : (
                         <p className="text-sm text-muted-foreground">
-                          Selected: {mapLocation.lat.toFixed(4)}, {mapLocation.lng.toFixed(4)}
+                          Search for a location above to add it to this transaction
                         </p>
                       )}
                     </div>
@@ -1296,7 +1407,12 @@ function TransactionsPageContent() {
                       placeholder="Search for a location..."
                       value={locationSearch}
                       onChange={(e) => setLocationSearch(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleLocationSearch())}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleLocationSearch();
+                        }
+                      }}
                     />
                     <Button
                       type="button"
@@ -1304,7 +1420,11 @@ function TransactionsPageContent() {
                       onClick={handleLocationSearch}
                       disabled={searchingLocation}
                     >
-                      <Search className="h-4 w-4" />
+                      {searchingLocation ? (
+                        <span className="h-4 w-4 animate-spin">⏳</span>
+                      ) : (
+                        <Search className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
 

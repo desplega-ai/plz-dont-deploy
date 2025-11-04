@@ -65,7 +65,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
    pnpm dev
    ```
 
-5. **Access the application** at http://localhost:3000
+5. **Access the application** at http://localhost:4010
 
 ### Test Credentials (Development)
 
@@ -132,14 +132,17 @@ git merge upstream/main
 
 - Use functional components with hooks
 - Implement proper loading and error states
-- Use Server Components by default (Next.js 15+)
+- Use Server Components by default (Next.js 16 App Router)
 - Add Client Components only when needed (`"use client"`)
 - Implement proper form validation with Zod
+- Keep client components minimal - only add `"use client"` for interactivity/hooks
 
 ### Database
 
 - Use Prisma for all database operations
-- Create migrations for schema changes
+- Always use the singleton instance from `src/lib/db.ts`
+- Create migrations for schema changes: `pnpm prisma migrate dev --name description`
+- Run `pnpm prisma generate` after schema changes
 - Test migrations both up and down
 - Never commit `.env` with real credentials
 
@@ -153,29 +156,16 @@ git merge upstream/main
 
 ## Testing
 
-### Running Tests
-
-```bash
-pnpm test
-# or
-npm test
-```
-
-### Writing Tests
-
-- Add tests for new features
-- Include unit tests for utility functions
-- Add integration tests for API endpoints
-- Test edge cases and error conditions
-
 ### Manual Testing
 
 Before submitting:
-- Test your changes in development
+- Test your changes in development (on port 4010)
 - Test on different screen sizes (responsive design)
 - Test with different user roles (user vs admin)
 - Check browser console for errors
-- Verify no TypeScript errors: `npx tsc --noEmit`
+- Verify no TypeScript errors: `pnpm exec tsc --noEmit`
+- Run linter: `pnpm lint`
+- Test build process: `pnpm build`
 
 ## Submitting Changes
 
@@ -279,24 +269,32 @@ Instead, see our [Security Policy](./SECURITY.md) for instructions on how to rep
 
 ### Useful Commands
 
+**Always use pnpm for consistency:**
+
 ```bash
-# Format code
-npm run lint
+# Run linter
+pnpm lint
 
 # Build for production
-npm run build
+pnpm build
 
 # Check TypeScript
-npx tsc --noEmit
+pnpm exec tsc --noEmit
 
-# Generate Prisma client
-npx prisma generate
+# Generate Prisma client after schema changes
+pnpm prisma generate
 
-# View database in browser
-npx prisma studio
+# View database in browser (opens on port 5555)
+pnpm prisma studio
 
-# Reset database (careful!)
-npx prisma migrate reset
+# Create a new migration
+pnpm prisma migrate dev --name description
+
+# Seed/reset test data
+pnpm db:seed
+
+# Reset database (WARNING: deletes all data!)
+pnpm prisma migrate reset
 ```
 
 ### Debugging
@@ -308,7 +306,18 @@ npx prisma migrate reset
 
 ### Common Issues
 
-See [SETUP.md](./SETUP.md) for common issues and solutions, especially regarding Prisma and Next.js 16 RC compatibility.
+See [SETUP.md](./SETUP.md) for common issues and solutions, especially regarding:
+- Prisma and Next.js 16 compatibility (webpack configuration)
+- Port 4010 configuration (not standard 3000)
+- Environment variable requirements
+- Database connection troubleshooting
+
+### Project-Specific Notes
+
+- **Port 4010**: This app runs on port 4010 by default, not 3000
+- **pnpm Only**: Use pnpm for all package operations for consistency
+- **Webpack**: The project uses webpack instead of Turbopack due to Prisma compatibility
+- **Prisma Singleton**: Always import `db` from `src/lib/db.ts`, never create new PrismaClient instances
 
 ## Questions?
 
